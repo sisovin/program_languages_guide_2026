@@ -14,6 +14,10 @@ Built with TypeScript, Tailwind CSS, and shadcn/ui. Fully responsive, theme-awar
 
 ---
 
+![Explore Languages](./public/languages.png)
+
+---
+
 ## ✨ Highlights
 
 - **Next.js 15 App Router** (TypeScript) with static generation
