@@ -21,11 +21,11 @@ export default function Page() {
               <span className="block text-primary mt-2">to Learn in 2026</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Discover the most in-demand programming languages, explore career paths, 
+              Discover the most in-demand programming languages, explore career paths,
               and make informed decisions about your tech journey.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Link href="#languages">
+              <Link href="#languages" prefetch={false}>
                 <Button size="lg" className="gap-2">
                   Explore Languages
                   <ArrowRight className="w-4 h-4" />
@@ -104,11 +104,11 @@ export default function Page() {
             Explore the Top 10 Languages
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Click on any language card to dive deep into its applications, advantages, 
+            Click on any language card to dive deep into its applications, advantages,
             salary insights, and career opportunities.
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {languages.map((language) => (
             <LanguageCard key={language.id} language={language} />
@@ -122,7 +122,7 @@ export default function Page() {
           <TrendingUp className="w-12 h-12 mx-auto text-primary" />
           <h2 className="text-3xl font-bold">Ready to Plan Your Career Path?</h2>
           <p className="text-muted-foreground">
-            Explore our interactive career path flowchart to see how different languages 
+            Explore our interactive career path flowchart to see how different languages
             map to various tech careers and find your perfect trajectory.
           </p>
           <Link href="/career-paths">
