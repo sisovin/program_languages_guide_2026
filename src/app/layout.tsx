@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
-import Header from "@/components/Header";
+import ResponsiveLayout from '@/components/Responsive';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,15 +20,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Header />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <footer className="border-t py-8 mt-16">
-            <div className="container text-center text-sm text-muted-foreground">
-              <p>© 2026 Top 10 Programming Languages. Built with Next.js & TypeScript.</p>
-            </div>
-          </footer>
+          <ResponsiveLayout>
+            <main className="min-h-screen">
+              {children}
+            </main>
+          </ResponsiveLayout>
         </ThemeProvider>
       </body>
     </html>

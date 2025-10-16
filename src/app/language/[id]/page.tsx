@@ -14,26 +14,27 @@ export function generateStaticParams() {
   }));
 }
 
-export default function LanguagePage({ params }: { params: { id: string } }) {
-  const language = languages.find((l) => l.id === params.id);
+export default async function LanguagePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const language = languages.find((l) => l.id === id);
 
   if (!language) {
     notFound();
   }
 
   const colors = domainColors[language.domain];
-  const currentIndex = languages.findIndex((l) => l.id === params.id);
+  const currentIndex = languages.findIndex((l) => l.id === id);
   const prevLanguage = currentIndex > 0 ? languages[currentIndex - 1] : null;
   const nextLanguage = currentIndex < languages.length - 1 ? languages[currentIndex + 1] : null;
 
   return (
     <div className="bg-background">
       <div className="container py-8">
-        <Breadcrumbs 
+        <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
             { label: language.name }
-          ]} 
+          ]}
         />
 
         {/* Hero Section */}
@@ -148,7 +149,7 @@ export default function LanguagePage({ params }: { params: { id: string } }) {
                   <p className="text-sm text-muted-foreground mb-2">Popularity Score</p>
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-3 bg-secondary rounded-full overflow-hidden">
-                      <div 
+                      <div
                         className={`h-full ${colors.text.replace('text-', 'bg-')}`}
                         style={{ width: `${language.popularity}%` }}
                       />
