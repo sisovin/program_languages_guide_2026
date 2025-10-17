@@ -23,9 +23,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <ResponsiveLayout>
-              <main id="main-content" className="min-h-screen" role="main">
-                {children}
-              </main>
+              {children}
             </ResponsiveLayout>
           </ThemeProvider>
         </ErrorBoundary>

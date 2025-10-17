@@ -91,6 +91,17 @@ const nextConfig = {
             },
         ];
     },
+
+    // Redirects for old routes
+    async redirects() {
+        return [
+            {
+                source: '/language/:id',
+                destination: '/languages/:id',
+                permanent: true,
+            },
+        ];
+    },
 };
 
 module.exports = nextConfig;

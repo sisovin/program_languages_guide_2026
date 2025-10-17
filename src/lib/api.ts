@@ -6,7 +6,7 @@ import {
   type ApiResponse,
 } from './error';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333/api';
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
 
 interface PaginatedResponse<T> {

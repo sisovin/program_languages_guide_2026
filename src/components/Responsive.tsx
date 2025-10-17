@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { Header } from './Header'
 import { Footer } from './Footer'
@@ -22,6 +22,12 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
     maxWidth = '7xl'
 }) => {
     const isMobile = useIsMobile()
+    const [mounted, setMounted] = useState(false)
+
+    // Prevent hydration mismatch by only applying mobile-specific styles after mount
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     const maxWidthClasses = {
         sm: 'max-w-sm',
@@ -47,7 +53,8 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
                 <div className={cn(
                     "py-6 sm:py-8 lg:py-12",
                     // Add responsive spacing based on mobile detection
-                    isMobile ? "space-y-4" : "space-y-6"
+                    // Use Tailwind classes to avoid hydration issues
+                    "space-y-4 sm:space-y-6"
                 )}>
                     {children}
                 </div>
@@ -56,8 +63,8 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
             {/* Footer */}
             {showFooter && <Footer />}
 
-            {/* Mobile-specific optimizations */}
-            {isMobile && (
+            {/* Mobile-specific optimizations - only render after mount to avoid hydration issues */}
+            {mounted && isMobile && (
                 <style jsx global>{`
                     /* Improve touch targets on mobile */
                     button, a, input, select, textarea {
