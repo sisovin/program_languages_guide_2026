@@ -95,14 +95,14 @@ export function Header() {
                 asChild
                 aria-label="Sign in to your account"
               >
-                <Link href="/auth/signin">Sign In</Link>
+                <Link href="/signin">Sign In</Link>
               </Button>
               <Button
                 size="sm"
                 asChild
                 aria-label="Create a new account"
               >
-                <Link href="/auth/signup">Sign Up</Link>
+                <Link href="/signup">Sign Up</Link>
               </Button>
             </div>
 
@@ -156,7 +156,7 @@ export function Header() {
                       className="w-full"
                       onClick={() => setIsOpen(false)}
                     >
-                      <Link href="/auth/signin">Sign In</Link>
+                      <Link href="/signin">Sign In</Link>
                     </Button>
                     <Button
                       size="sm"
@@ -164,7 +164,7 @@ export function Header() {
                       className="w-full"
                       onClick={() => setIsOpen(false)}
                     >
-                      <Link href="/auth/signup">Sign Up</Link>
+                      <Link href="/signup">Sign Up</Link>
                     </Button>
                   </div>
                 </div>

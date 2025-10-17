@@ -3,66 +3,273 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Breadcrumbs from '@/components/Breadcrumbs';
-import { languages } from '@/data/languages';
-import { ArrowRight, Briefcase, Code2, Database, Smartphone, Brain, Cpu } from 'lucide-react';
+import { api } from '@/lib/api';
+import { ArrowRight, Briefcase, Code2, Database, Smartphone, Brain, Cpu, DollarSign, Clock } from 'lucide-react';
 
-export default function CareerPathsPage() {
-  const careerPaths = [
-    {
-      title: 'Web Development',
-      icon: Code2,
-      color: 'blue',
-      description: 'Build modern web applications and services',
-      languages: languages.filter(l => ['javascript', 'typescript', 'python', 'java', 'csharp'].includes(l.id)),
-      roles: ['Frontend Developer', 'Backend Developer', 'Full-Stack Developer', 'Web Architect'],
-      salaryRange: '$75K - $175K'
-    },
-    {
-      title: 'Mobile Development',
-      icon: Smartphone,
-      color: 'purple',
-      description: 'Create native and cross-platform mobile apps',
-      languages: languages.filter(l => ['kotlin', 'swift', 'javascript'].includes(l.id)),
-      roles: ['iOS Developer', 'Android Developer', 'Mobile Architect', 'React Native Developer'],
-      salaryRange: '$80K - $175K'
-    },
-    {
-      title: 'AI & Machine Learning',
-      icon: Brain,
-      color: 'emerald',
-      description: 'Develop intelligent systems and data solutions',
-      languages: languages.filter(l => ['python', 'sql'].includes(l.id)),
-      roles: ['ML Engineer', 'Data Scientist', 'AI Researcher', 'NLP Engineer'],
-      salaryRange: '$90K - $185K'
-    },
-    {
-      title: 'Systems & Infrastructure',
-      icon: Cpu,
-      color: 'orange',
-      description: 'Build high-performance systems and tools',
-      languages: languages.filter(l => ['rust', 'go', 'java'].includes(l.id)),
-      roles: ['Systems Engineer', 'DevOps Engineer', 'Cloud Architect', 'Site Reliability Engineer'],
-      salaryRange: '$90K - $185K'
-    },
-    {
-      title: 'Data Engineering',
-      icon: Database,
-      color: 'indigo',
-      description: 'Design and maintain data pipelines',
-      languages: languages.filter(l => ['python', 'sql', 'java', 'go'].includes(l.id)),
-      roles: ['Data Engineer', 'Database Administrator', 'ETL Developer', 'Big Data Engineer'],
-      salaryRange: '$85K - $170K'
-    },
-    {
-      title: 'Game Development',
-      icon: Briefcase,
-      color: 'pink',
-      description: 'Create interactive gaming experiences',
-      languages: languages.filter(l => ['csharp', 'javascript', 'rust'].includes(l.id)),
-      roles: ['Game Developer', 'Unity Developer', 'Graphics Engineer', 'Gameplay Programmer'],
-      salaryRange: '$70K - $160K'
-    }
-  ];
+interface CareerPath {
+  id: number;
+  title: string;
+  description: string;
+  salaryRange: {
+    min: number;
+    max: number;
+    currency: string;
+    experienceLevel?: string;
+  };
+  experienceRequired: string;
+  language: {
+    id: number;
+    name: string;
+    logoUrl: string;
+    popularityIndex: number;
+  };
+}
+
+interface CareerCategory {
+  title: string;
+  icon: any;
+  color: string;
+  description: string;
+  careerPaths: CareerPath[];
+  roles: string[];
+  salaryRange: string;
+}
+
+export default async function CareerPathsPage() {
+  let careerPaths: CareerPath[] = [];
+  let careerCategories: CareerCategory[] = [];
+
+  try {
+    // Fetch career paths from API
+    const response = await api.getCareerPaths({ limit: 100 });
+    careerPaths = response.data;
+
+    // Group career paths by categories
+    const categoryMap: Record<string, CareerPath[]> = {};
+
+    careerPaths.forEach(path => {
+      let category = '';
+
+      // Categorize based on job title keywords
+      if (path.title.toLowerCase().includes('frontend') || path.title.toLowerCase().includes('backend') || path.title.toLowerCase().includes('full') || path.title.toLowerCase().includes('web')) {
+        category = 'Web Development';
+      } else if (path.title.toLowerCase().includes('mobile') || path.title.toLowerCase().includes('ios') || path.title.toLowerCase().includes('android')) {
+        category = 'Mobile Development';
+      } else if (path.title.toLowerCase().includes('data') || path.title.toLowerCase().includes('machine') || path.title.toLowerCase().includes('ai') || path.title.toLowerCase().includes('ml')) {
+        category = 'AI & Machine Learning';
+      } else if (path.title.toLowerCase().includes('system') || path.title.toLowerCase().includes('devops') || path.title.toLowerCase().includes('infrastructure')) {
+        category = 'Systems & Infrastructure';
+      } else if (path.title.toLowerCase().includes('game') || path.title.toLowerCase().includes('unity')) {
+        category = 'Game Development';
+      } else {
+        category = 'Data Engineering';
+      }
+
+      if (!categoryMap[category]) {
+        categoryMap[category] = [];
+      }
+      categoryMap[category].push(path);
+    });
+
+    // Convert to career categories
+    careerCategories = Object.entries(categoryMap).map(([title, paths]) => {
+      const categoryConfig: Record<string, any> = {
+        'Web Development': {
+          icon: Code2,
+          color: 'blue',
+          description: 'Build modern web applications and services',
+          roles: ['Frontend Developer', 'Backend Developer', 'Full-Stack Developer', 'Web Architect']
+        },
+        'Mobile Development': {
+          icon: Smartphone,
+          color: 'purple',
+          description: 'Create native and cross-platform mobile apps',
+          roles: ['iOS Developer', 'Android Developer', 'Mobile Architect', 'React Native Developer']
+        },
+        'AI & Machine Learning': {
+          icon: Brain,
+          color: 'emerald',
+          description: 'Develop intelligent systems and data solutions',
+          roles: ['ML Engineer', 'Data Scientist', 'AI Researcher', 'NLP Engineer']
+        },
+        'Systems & Infrastructure': {
+          icon: Cpu,
+          color: 'orange',
+          description: 'Build high-performance systems and tools',
+          roles: ['Systems Engineer', 'DevOps Engineer', 'Cloud Architect', 'Site Reliability Engineer']
+        },
+        'Data Engineering': {
+          icon: Database,
+          color: 'indigo',
+          description: 'Design and maintain data pipelines',
+          roles: ['Data Engineer', 'Database Administrator', 'ETL Developer', 'Big Data Engineer']
+        },
+        'Game Development': {
+          icon: Briefcase,
+          color: 'pink',
+          description: 'Create interactive gaming experiences',
+          roles: ['Game Developer', 'Unity Developer', 'Graphics Engineer', 'Gameplay Programmer']
+        }
+      };
+
+      const config = categoryConfig[title] || categoryConfig['Web Development'];
+
+      // Calculate salary range for category
+      const salaries = paths.map(p => p.salaryRange.min);
+      const maxSalaries = paths.map(p => p.salaryRange.max);
+      const minSalary = Math.min(...salaries);
+      const maxSalary = Math.max(...maxSalaries);
+
+      return {
+        title,
+        icon: config.icon,
+        color: config.color,
+        description: config.description,
+        careerPaths: paths,
+        roles: config.roles,
+        salaryRange: `$${minSalary.toLocaleString()} - $${maxSalary.toLocaleString()}`
+      };
+    });
+
+  } catch (error) {
+    // Fallback data when API is unavailable
+    console.warn('Failed to fetch career paths from API, using fallback data:', error);
+
+    careerCategories = [
+      {
+        title: 'Web Development',
+        icon: Code2,
+        color: 'blue',
+        description: 'Build modern web applications and services',
+        careerPaths: [
+          {
+            id: 1,
+            title: 'Frontend Developer',
+            description: 'Create interactive user interfaces using React, Vue, or Angular frameworks.',
+            salaryRange: { min: 75000, max: 130000, currency: 'USD', experienceLevel: 'mid' },
+            experienceRequired: '2-4 years',
+            language: { id: 2, name: 'JavaScript', logoUrl: '', popularityIndex: 1 }
+          },
+          {
+            id: 2,
+            title: 'Backend Developer',
+            description: 'Build scalable web applications and APIs using various frameworks.',
+            salaryRange: { min: 85000, max: 140000, currency: 'USD', experienceLevel: 'mid' },
+            experienceRequired: '2-4 years',
+            language: { id: 1, name: 'Python', logoUrl: '', popularityIndex: 2 }
+          }
+        ],
+        roles: ['Frontend Developer', 'Backend Developer', 'Full-Stack Developer', 'Web Architect'],
+        salaryRange: '$75K - $175K'
+      },
+      {
+        title: 'Mobile Development',
+        icon: Smartphone,
+        color: 'purple',
+        description: 'Create native and cross-platform mobile apps',
+        careerPaths: [
+          {
+            id: 3,
+            title: 'Android Developer',
+            description: 'Create native Android applications using modern development practices.',
+            salaryRange: { min: 85000, max: 150000, currency: 'USD', experienceLevel: 'mid' },
+            experienceRequired: '2-4 years',
+            language: { id: 3, name: 'Java', logoUrl: '', popularityIndex: 3 }
+          },
+          {
+            id: 4,
+            title: 'iOS Developer',
+            description: 'Develop native iOS applications with Swift and modern frameworks.',
+            salaryRange: { min: 90000, max: 160000, currency: 'USD', experienceLevel: 'mid' },
+            experienceRequired: '2-4 years',
+            language: { id: 4, name: 'Swift', logoUrl: '', popularityIndex: 4 }
+          }
+        ],
+        roles: ['iOS Developer', 'Android Developer', 'Mobile Architect', 'React Native Developer'],
+        salaryRange: '$80K - $175K'
+      },
+      {
+        title: 'AI & Machine Learning',
+        icon: Brain,
+        color: 'emerald',
+        description: 'Develop intelligent systems and data solutions',
+        careerPaths: [
+          {
+            id: 5,
+            title: 'Data Scientist',
+            description: 'Analyze complex datasets to extract insights and build predictive models.',
+            salaryRange: { min: 95000, max: 160000, currency: 'USD', experienceLevel: 'mid' },
+            experienceRequired: '3-5 years',
+            language: { id: 1, name: 'Python', logoUrl: '', popularityIndex: 2 }
+          },
+          {
+            id: 6,
+            title: 'Machine Learning Engineer',
+            description: 'Design and implement ML algorithms and systems.',
+            salaryRange: { min: 110000, max: 180000, currency: 'USD', experienceLevel: 'senior' },
+            experienceRequired: '4-7 years',
+            language: { id: 1, name: 'Python', logoUrl: '', popularityIndex: 2 }
+          }
+        ],
+        roles: ['ML Engineer', 'Data Scientist', 'AI Researcher', 'NLP Engineer'],
+        salaryRange: '$90K - $185K'
+      },
+      {
+        title: 'Systems & Infrastructure',
+        icon: Cpu,
+        color: 'orange',
+        description: 'Build high-performance systems and tools',
+        careerPaths: [
+          {
+            id: 7,
+            title: 'DevOps Engineer',
+            description: 'Automate deployment and manage cloud infrastructure.',
+            salaryRange: { min: 95000, max: 160000, currency: 'USD', experienceLevel: 'mid' },
+            experienceRequired: '3-5 years',
+            language: { id: 5, name: 'Go', logoUrl: '', popularityIndex: 5 }
+          }
+        ],
+        roles: ['Systems Engineer', 'DevOps Engineer', 'Cloud Architect', 'Site Reliability Engineer'],
+        salaryRange: '$90K - $185K'
+      },
+      {
+        title: 'Data Engineering',
+        icon: Database,
+        color: 'indigo',
+        description: 'Design and maintain data pipelines',
+        careerPaths: [
+          {
+            id: 8,
+            title: 'Data Engineer',
+            description: 'Build and maintain scalable data processing systems.',
+            salaryRange: { min: 95000, max: 165000, currency: 'USD', experienceLevel: 'mid' },
+            experienceRequired: '3-5 years',
+            language: { id: 1, name: 'Python', logoUrl: '', popularityIndex: 2 }
+          }
+        ],
+        roles: ['Data Engineer', 'Database Administrator', 'ETL Developer', 'Big Data Engineer'],
+        salaryRange: '$85K - $170K'
+      },
+      {
+        title: 'Game Development',
+        icon: Briefcase,
+        color: 'pink',
+        description: 'Create interactive gaming experiences',
+        careerPaths: [
+          {
+            id: 9,
+            title: 'Game Developer',
+            description: 'Develop interactive games and gaming systems.',
+            salaryRange: { min: 70000, max: 140000, currency: 'USD', experienceLevel: 'mid' },
+            experienceRequired: '2-4 years',
+            language: { id: 6, name: 'C++', logoUrl: '', popularityIndex: 6 }
+          }
+        ],
+        roles: ['Game Developer', 'Unity Developer', 'Graphics Engineer', 'Gameplay Programmer'],
+        salaryRange: '$70K - $160K'
+      }
+    ];
+  }
 
   const colorClasses: Record<string, { bg: string; border: string; text: string; badge: string }> = {
     blue: {
@@ -106,63 +313,59 @@ export default function CareerPathsPage() {
   return (
     <div className="bg-background">
       <div className="container py-8">
-        <Breadcrumbs 
+        <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
             { label: 'Career Paths' }
-          ]} 
+          ]}
         />
 
         <div className="mb-12">
           <h1 className="text-4xl font-bold mb-4">Tech Career Paths</h1>
           <p className="text-muted-foreground text-lg max-w-3xl">
-            Explore different career trajectories in tech and discover which programming languages 
+            Explore different career trajectories in tech and discover which programming languages
             align with your career goals. Each path offers unique opportunities and challenges.
           </p>
         </div>
 
         {/* Career Path Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          {careerPaths.map((path) => {
-            const colors = colorClasses[path.color];
-            const Icon = path.icon;
-            
-            return (
+          {careerCategories.map((category) => {
+            const colors = colorClasses[category.color];
+            const Icon = category.icon;
+
+            return category.careerPaths.map((path) => (
               <Card key={path.title} className={`border-2 ${colors.border} ${colors.bg} hover:shadow-lg transition-all`}>
                 <CardHeader>
                   <div className="flex items-start justify-between mb-3">
                     <Icon className={`w-10 h-10 ${colors.text}`} />
-                    <Badge className={colors.badge}>{path.salaryRange}</Badge>
+                    <Badge className={colors.badge}>
+                      ${path.salaryRange.min / 1000}K - ${path.salaryRange.max / 1000}K
+                    </Badge>
                   </div>
                   <CardTitle className="text-2xl">{path.title}</CardTitle>
                   <p className="text-muted-foreground">{path.description}</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h4 className="font-semibold mb-2 text-sm">Key Languages</h4>
+                    <h4 className="font-semibold mb-2 text-sm">Language</h4>
                     <div className="flex flex-wrap gap-2">
-                      {path.languages.map((lang) => (
-                        <Link key={lang.id} href={`/language/${lang.id}`}>
-                          <Badge variant="outline" className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
-                            {lang.icon} {lang.name}
-                          </Badge>
-                        </Link>
-                      ))}
+                      <Link href={`/language/${path.language.id}`}>
+                        <Badge variant="outline" className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
+                          {path.language.name}
+                        </Badge>
+                      </Link>
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2 text-sm">Common Roles</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {path.roles.map((role) => (
-                        <Badge key={role} variant="secondary" className="text-xs">
-                          {role}
-                        </Badge>
-                      ))}
-                    </div>
+                    <h4 className="font-semibold mb-2 text-sm">Experience Required</h4>
+                    <Badge variant="secondary" className="text-xs">
+                      {path.experienceRequired}
+                    </Badge>
                   </div>
                 </CardContent>
               </Card>
-            );
+            ));
           })}
         </div>
 

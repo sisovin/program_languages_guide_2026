@@ -42,7 +42,7 @@ export function LanguageCard({ language }: LanguageCardProps) {
           <div>
             <h4 className="text-xs font-semibold mb-2 text-muted-foreground">Use Cases</h4>
             <div className="flex flex-wrap gap-1">
-              {useCases.slice(0, 3).map((useCase, index) => (
+              {useCases.slice(0, 3).map((useCase: string, index: number) => (
                 <Badge key={index} variant="secondary" className="text-xs">
                   {useCase}
                 </Badge>

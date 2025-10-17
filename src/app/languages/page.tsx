@@ -35,25 +35,25 @@ export default async function LanguagesPage({
   const categorizedLanguages = {
     all: languages,
     web: languages.filter((lang) =>
-      lang.useCases.some((useCase) =>
+      lang.useCases.some((useCase: string) =>
         useCase.toLowerCase().includes('web')
       )
     ),
     mobile: languages.filter((lang) =>
-      lang.useCases.some((useCase) =>
+      lang.useCases.some((useCase: string) =>
         useCase.toLowerCase().includes('mobile')
       )
     ),
     data: languages.filter((lang) =>
-      lang.useCases.some((useCase) =>
-        ['data science', 'machine learning', 'big data'].some((term) =>
+      lang.useCases.some((useCase: string) =>
+        ['data science', 'machine learning', 'big data'].some((term: string) =>
           useCase.toLowerCase().includes(term)
         )
       )
     ),
     systems: languages.filter((lang) =>
-      lang.useCases.some((useCase) =>
-        ['system', 'embedded', 'operating'].some((term) =>
+      lang.useCases.some((useCase: string) =>
+        ['system', 'embedded', 'operating'].some((term: string) =>
           useCase.toLowerCase().includes(term)
         )
       )

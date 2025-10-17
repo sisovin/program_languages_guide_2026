@@ -39,6 +39,27 @@ export interface Language {
   updatedAt: string;
 }
 
+export interface CareerPath {
+  id: number;
+  languageId: number;
+  title: string;
+  description: string;
+  salaryRange: {
+    min: number;
+    max: number;
+    currency: string;
+    experienceLevel?: string;
+  };
+  experienceRequired: string;
+  createdAt: string;
+  language: {
+    id: number;
+    name: string;
+    logoUrl: string;
+    popularityIndex: number;
+  };
+}
+
 /**
  * Make API request with error handling and timeout
  */
@@ -170,6 +191,26 @@ export const api = {
     return request<PaginatedResponse<void>>(url, {
       method: 'DELETE',
     });
+  },
+
+  async getCareerPaths(params?: {
+    page?: number;
+    limit?: number;
+    languageId?: number;
+    sort?: string;
+    order?: 'asc' | 'desc';
+  }): Promise<PaginatedResponse<CareerPath[]>> {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.languageId) queryParams.append('languageId', params.languageId.toString());
+    if (params?.sort) queryParams.append('sort', params.sort);
+    if (params?.order) queryParams.append('order', params.order);
+
+    const url = `${API_URL}/career-paths${queryParams.toString() ? `?${queryParams}` : ''}`;
+
+    // Retry GET requests up to 3 times
+    return retryRequest(() => request<PaginatedResponse<CareerPath[]>>(url));
   },
 };
 
