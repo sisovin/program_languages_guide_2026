@@ -1,62 +1,87 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { languages, domainColors } from '@/data/languages';
+import { api, Language } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Breadcrumbs from '@/components/Breadcrumbs';
-import SalaryVisualization from '@/components/SalaryVisualization';
-import { CheckCircle2, ArrowLeft, ArrowRight, Briefcase, GraduationCap } from 'lucide-react';
+import { CheckCircle2, ArrowLeft, TrendingUp, DollarSign } from 'lucide-react';
+import { generateLanguageMetadata } from '@/lib/metadata';
+import type { Metadata } from 'next';
 
-export function generateStaticParams() {
-  return languages.map((lang) => ({
-    id: lang.id,
-  }));
+// Generate metadata for SEO
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+
+  try {
+    const response = await api.getLanguageById(parseInt(id));
+    return generateLanguageMetadata(response.data);
+  } catch (error) {
+    return {
+      title: 'Language Not Found',
+      description: 'The requested programming language could not be found.',
+    };
+  }
 }
 
 export default async function LanguagePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const language = languages.find((l) => l.id === id);
 
-  if (!language) {
+  let language: Language;
+  try {
+    const response = await api.getLanguageById(parseInt(id));
+    language = response.data;
+  } catch (error) {
     notFound();
   }
 
-  const colors = domainColors[language.domain];
-  const currentIndex = languages.findIndex((l) => l.id === id);
-  const prevLanguage = currentIndex > 0 ? languages[currentIndex - 1] : null;
-  const nextLanguage = currentIndex < languages.length - 1 ? languages[currentIndex + 1] : null;
+  // Fetch all languages to get prev/next navigation
+  const allLanguagesResponse = await api.getLanguages({ limit: 100, sort: 'popularityIndex', order: 'desc' });
+  const allLanguages = allLanguagesResponse.data;
+  const currentIndex = allLanguages.findIndex((l) => l.id === language.id);
+  const prevLanguage = currentIndex > 0 ? allLanguages[currentIndex - 1] : null;
+  const nextLanguage = currentIndex < allLanguages.length - 1 ? allLanguages[currentIndex + 1] : null;
+
 
   return (
-    <div className="bg-background">
+    <div className="bg-background min-h-screen">
       <div className="container py-8">
-        <Breadcrumbs
-          items={[
-            { label: 'Home', href: '/' },
-            { label: language.name }
-          ]}
-        />
+        {/* Breadcrumb Navigation */}
+        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+          <Link href="/" className="hover:text-foreground">Home</Link>
+          <span>/</span>
+          <span className="text-foreground">{language.name}</span>
+        </nav>
 
         {/* Hero Section */}
-        <div className={`rounded-2xl p-8 md:p-12 mb-8 border-2 ${colors.border} ${colors.bg}`}>
+        <div className="rounded-xl p-8 md:p-12 mb-8 bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-            <div className="text-7xl md:text-8xl">{language.icon}</div>
+            {language.logoUrl && (
+              <div className="w-24 h-24 relative">
+                <img
+                  src={language.logoUrl}
+                  alt={`${language.name} logo`}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            )}
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
                 <h1 className="text-4xl md:text-5xl font-bold">{language.name}</h1>
-                <Badge className={colors.badge}>
-                  {language.domain.toUpperCase()}
+                <Badge variant="secondary" className="w-fit">
+                  Since {language.releaseYear}
                 </Badge>
               </div>
-              <p className="text-xl text-muted-foreground mb-4">{language.tagline}</p>
-              <div className="flex flex-wrap gap-4">
+              <p className="text-xl text-muted-foreground mb-4">{language.description}</p>
+              <div className="flex flex-wrap gap-4 text-sm">
                 <div className="flex items-center gap-2">
-                  <GraduationCap className="w-5 h-5" />
-                  <span className="font-medium">{language.learningCurve} to Learn</span>
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                  <span className="font-medium">Popularity: {language.popularityIndex}/100</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Briefcase className="w-5 h-5" />
-                  <span className="font-medium">{language.popularity}% Popularity</span>
+                  <DollarSign className="w-5 h-5 text-green-600" />
+                  <span className="font-medium">
+                    ${language.salaryRange.min.toLocaleString()} - ${language.salaryRange.max.toLocaleString()} {language.salaryRange.currency}
+                  </span>
                 </div>
               </div>
             </div>
@@ -65,71 +90,72 @@ export default async function LanguagePage({ params }: { params: Promise<{ id: s
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Overview */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Use Cases */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl">Overview</CardTitle>
+                <CardTitle>Use Cases</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">{language.overview}</p>
-              </CardContent>
-            </Card>
-
-            {/* Applications */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">Key Applications</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  {language.applications.map((app, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <CheckCircle2 className={`w-5 h-5 mt-0.5 flex-shrink-0 ${colors.text}`} />
-                      <span>{app}</span>
-                    </li>
+                <div className="flex flex-wrap gap-2">
+                  {language.useCases.map((useCase, index) => (
+                    <Badge key={index} variant="outline" className="text-sm">
+                      {useCase}
+                    </Badge>
                   ))}
-                </ul>
+                </div>
               </CardContent>
             </Card>
 
-            {/* Advantages */}
+            {/* Key Advantages */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl">Key Advantages</CardTitle>
+                <CardTitle>Key Advantages</CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">
                   {language.advantages.map((advantage, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <CheckCircle2 className={`w-5 h-5 mt-0.5 flex-shrink-0 ${colors.text}`} />
+                      <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
                       <span>{advantage}</span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
             </Card>
-
-            {/* Career Relevance */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">Career Relevance</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed">{language.careerRelevance}</p>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Salary Range */}
+            {/* Salary Information */}
             <Card>
               <CardHeader>
-                <CardTitle>Salary Range (USD)</CardTitle>
+                <CardTitle>Salary Range</CardTitle>
               </CardHeader>
               <CardContent>
-                <SalaryVisualization language={language} />
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm text-muted-foreground">Minimum</span>
+                      <span className="font-bold text-lg">${language.salaryRange.min.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm text-muted-foreground">Maximum</span>
+                      <span className="font-bold text-lg">${language.salaryRange.max.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Currency</span>
+                      <span className="font-medium">{language.salaryRange.currency}</span>
+                    </div>
+                    {language.salaryRange.experienceLevel && (
+                      <div className="flex justify-between mt-2">
+                        <span className="text-sm text-muted-foreground">Level</span>
+                        <span className="font-medium">{language.salaryRange.experienceLevel}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="h-2 bg-gradient-to-r from-blue-500 to-green-500 rounded-full"></div>
+                </div>
               </CardContent>
             </Card>
 
@@ -138,76 +164,45 @@ export default async function LanguagePage({ params }: { params: Promise<{ id: s
               <CardHeader>
                 <CardTitle>Quick Stats</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Learning Difficulty</p>
-                  <Badge variant="outline" className="text-base">
-                    {language.learningCurve}
-                  </Badge>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Release Year</span>
+                  <span className="font-bold">{language.releaseYear}</span>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">Popularity Score</p>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-3 bg-secondary rounded-full overflow-hidden">
-                      <div
-                        className={`h-full ${colors.text.replace('text-', 'bg-')}`}
-                        style={{ width: `${language.popularity}%` }}
-                      />
-                    </div>
-                    <span className="font-bold text-lg">{language.popularity}%</span>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Popularity Index</span>
+                  <span className="font-bold">{language.popularityIndex}/100</span>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Primary Domain</p>
-                  <Badge className={colors.badge}>
-                    {language.domain.toUpperCase()}
-                  </Badge>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Use Cases</span>
+                  <span className="font-bold">{language.useCases.length}</span>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Compare CTA */}
-            <Card className="bg-primary/5 border-primary/20">
-              <CardHeader>
-                <CardTitle className="text-lg">Compare Languages</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  See how {language.name} stacks up against other languages
-                </p>
-                <Link href="/compare">
-                  <Button className="w-full">
-                    Go to Comparison Tool
-                  </Button>
-                </Link>
               </CardContent>
             </Card>
           </div>
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-between items-center mt-12 pt-8 border-t">
+        <div className="flex justify-between mt-12 pt-8 border-t">
           {prevLanguage ? (
             <Link href={`/language/${prevLanguage.id}`}>
               <Button variant="outline" className="gap-2">
                 <ArrowLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Previous: </span>
-                {prevLanguage.icon} {prevLanguage.name}
+                {prevLanguage.name}
               </Button>
             </Link>
           ) : (
-            <div />
+            <div></div>
           )}
           {nextLanguage ? (
             <Link href={`/language/${nextLanguage.id}`}>
               <Button variant="outline" className="gap-2">
-                <span className="hidden sm:inline">Next: </span>
-                {nextLanguage.icon} {nextLanguage.name}
-                <ArrowRight className="w-4 h-4" />
+                {nextLanguage.name}
+                <ArrowLeft className="w-4 h-4 rotate-180" />
               </Button>
             </Link>
           ) : (
-            <div />
+            <div></div>
           )}
         </div>
       </div>

@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "name": "top-programs-guide-frontend",
+  "public": false,
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "regions": [
+    "iad1"
+  ],
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_API_URL": "@api-url",
+      "NEXT_PUBLIC_APP_ENV": "production"
+    }
+  },
+  "env": {
+    "NEXT_PUBLIC_API_URL": {
+      "description": "Backend API URL (e.g., https://api.top-programs-guide.com)",
+      "value": ""
+    },
+    "NEXT_PUBLIC_APP_ENV": {
+      "description": "Application environment",
+      "value": "production"
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/app",
+      "destination": "/",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "$API_URL/api/:path*"
+    }
+  ],
+  "functions": {
+    "app/**/*": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+}

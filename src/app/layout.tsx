@@ -3,13 +3,13 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import ResponsiveLayout from '@/components/Responsive';
+import { defaultMetadata } from '@/lib/metadata';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { SkipToContent } from '@/components/SkipToContent';
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: "Top 10 Programming Languages 2026",
-  description: "Discover the top 10 programming languages to learn in 2026 with detailed insights, salary ranges, and career paths.",
-};
+export const metadata: Metadata = defaultMetadata;
 
 export default function RootLayout({
   children,
@@ -18,14 +18,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <ResponsiveLayout>
-            <main className="min-h-screen">
-              {children}
-            </main>
-          </ResponsiveLayout>
-        </ThemeProvider>
+      <body className={inter.className} suppressHydrationWarning>
+        <SkipToContent />
+        <ErrorBoundary>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ResponsiveLayout>
+              <main id="main-content" className="min-h-screen" role="main">
+                {children}
+              </main>
+            </ResponsiveLayout>
+          </ThemeProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

@@ -2,8 +2,8 @@
 
 import React from 'react'
 import { useIsMobile } from '@/hooks/use-mobile'
-import Header from './Header'
-import Footer from './Footer'
+import { Header } from './Header'
+import { Footer } from './Footer'
 import { cn } from '@/lib/utils'
 
 interface ResponsiveLayoutProps {

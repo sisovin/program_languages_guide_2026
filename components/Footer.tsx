@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export function Footer() {
   return (
-    <footer className="w-full border-t bg-background" role="contentinfo">
+    <footer className="w-full border-t bg-background">
       <div className="container py-8 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-3">
@@ -14,22 +14,22 @@ export function Footer() {
 
           <div className="space-y-3">
             <h4 className="text-sm font-semibold">Explore</h4>
-            <nav className="flex flex-col space-y-2" aria-label="Explore navigation">
+            <nav className="flex flex-col space-y-2">
               <Link
                 href="/"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 All Languages
               </Link>
               <Link
                 href="/career-paths"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 Career Paths
               </Link>
               <Link
                 href="/compare"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 Compare Languages
               </Link>
@@ -38,22 +38,22 @@ export function Footer() {
 
           <div className="space-y-3">
             <h4 className="text-sm font-semibold">Resources</h4>
-            <nav className="flex flex-col space-y-2" aria-label="Resources navigation">
+            <nav className="flex flex-col space-y-2">
               <Link
                 href="/about"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 About
               </Link>
               <Link
                 href="/blog"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 Blog
               </Link>
               <Link
                 href="/faq"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 FAQ
               </Link>
@@ -62,16 +62,16 @@ export function Footer() {
 
           <div className="space-y-3">
             <h4 className="text-sm font-semibold">Legal</h4>
-            <nav className="flex flex-col space-y-2" aria-label="Legal navigation">
+            <nav className="flex flex-col space-y-2">
               <Link
                 href="/privacy"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 Privacy Policy
               </Link>
               <Link
                 href="/terms"
-                className="text-sm text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 Terms of Service
               </Link>
